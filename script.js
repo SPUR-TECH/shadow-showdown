@@ -35,12 +35,48 @@ window.addEventListener('load', function () {
             this.gameHeight = gameHeight;
             this.width = 200;
             this.height = 200;
-            this.x = 10;
-            this.y = this.gameHeight - this.height - 10;
+            this.x = 0;
+            this.y = this.gameHeight - this.height;
+            this.image = document.getElementById('playerImage');
+            this.frameX = 0;
+            this.frameY = 0;
+            this.speed = 0;
+            this.vy = 0;
+            this.gravity = 1;
         }
-        draw(context) {
-            context.fillStyle = 'white';
-            context.fillRect(this.x, this.y, this.width, this.height);
+        draw(ctx) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+        update(input) {
+            if (input.keys.indexOf('ArrowRight') > -1) {
+                this.speed = 5;
+            } else if (input.keys.indexOf('ArrowLeft') > -1) {
+                this.speed = -5;
+            } else if (input.keys.indexOf('ArrowUp') > -1 && this.onGround()) {
+                this.vy = -30;
+            } else {
+                this.speed = 0;
+            }
+            // Horizontal movement
+            this.x += this.speed;
+            if (this.x < 0) this.x = 0;
+            else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+
+            // vertical movement
+            this.y += this.vy;
+            if (!this.onGround()) {
+                this.vy += this.gravity;
+                this.frameY = 1;
+            } else {
+                this.vy = 0;
+                this.frameY = 0;
+            }
+            if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
+        }
+        onGround() {
+            return this.y >= this.gameHeight - this.height;
         }
     }
 
@@ -62,9 +98,12 @@ window.addEventListener('load', function () {
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
-    player.draw(ctx);
 
     function animate() {
-
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        player.draw(ctx);
+        player.update(input);
+        requestAnimationFrame(animate);
     }
+    animate();
 });

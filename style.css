@@ -17,8 +17,8 @@ body {
     border: 5px solid white;
 }
 
-#playerimage,
-#backgroundimage,
-#enemyimage {
+#playerImage,
+#backgroundImage,
+#enemyImage {
     display: none;
 }
