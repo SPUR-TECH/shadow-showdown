@@ -5,6 +5,7 @@ window.addEventListener('load', function () {
     canvas.height = 720;
     let enemies = [];
     let score = 0;
+    let gameOver = false;
 
     class InputHandler {
         constructor() {
@@ -51,9 +52,22 @@ window.addEventListener('load', function () {
             this.gravity = 1;
         }
         draw(ctx) {
+            ctx.strokeStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(this.x + this.width / 2, this.y + this.width / 2, this.width / 2, 0, Math.PI * 2);
+            ctx.stroke();
             ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
-        update(input, deltaTime) {
+        update(input, deltaTime, enemies) {
+            // collisionDetection
+            enemies.forEach(enemy => {
+                const dx = (enemy.x + enemy.width / 2 - 40) - (this.x + enemy.width / 2);
+                const dy = (enemy.y + enemy.height / 2) - (this.y + enemy.height / 2);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < enemy.width / 2 + this.width / 2) {
+                    gameOver = true;
+                }
+            })
             // Sprite Animation
             if (this.frameTimer > this.frameInterval) {
                 if (this.frameX >= this.maxFrame) this.frameX = 0;
@@ -134,6 +148,10 @@ window.addEventListener('load', function () {
 
         }
         draw(ctx) {
+            ctx.strokeStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(this.x + this.width / 2 - 15, this.y + this.width / 2 - 5, this.width / 2 + 5, 0, Math.PI * 2);
+            ctx.stroke();
             ctx.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(deltaTime) {
@@ -174,6 +192,14 @@ window.addEventListener('load', function () {
         ctx.fillText('Score: ' + score, 20, 50)
         ctx.fillStyle = 'white';
         ctx.fillText('Score: ' + score, 23, 53)
+        if (gameOver) {
+            ctx.textAlign = 'center';
+            ctx.font = '40px Helvetica';
+            ctx.fillStyle = 'black';
+            ctx.fillText('GameOver, try again!', canvas.width / 2, 200)
+            ctx.fillStyle = 'white';
+            ctx.fillText('GameOver, try again!', canvas.width / 2 + 3, 203)
+        }
     }
 
     const input = new InputHandler();
@@ -192,10 +218,10 @@ window.addEventListener('load', function () {
         background.draw(ctx);
         background.update();
         player.draw(ctx);
-        player.update(input, deltaTime);
+        player.update(input, deltaTime, enemies);
         handleEnemies(deltaTime);
         displayStatusText(ctx);
-        requestAnimationFrame(animate);
+        if (!gameOver) requestAnimationFrame(animate);
     }
     animate(0);
 });
