@@ -211,15 +211,18 @@ window.addEventListener('load', function () {
         ctx.font = '40px Helvetica';
         ctx.fillStyle = 'black';
         ctx.fillText('Score: ' + score, 20, 50)
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = 'yellow';
         ctx.fillText('Score: ' + score, 23, 53)
         if (gameOver) {
             ctx.textAlign = 'center';
             ctx.font = '60px Helvetica';
-            ctx.fillStyle = 'black';
-            ctx.fillText('GAMEOVER!! press "ENTER" to try again!', canvas.width / 2, 200)
+            ctx.fillStyle = 'red';
+            ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
+            ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2, 250);
+
             ctx.fillStyle = 'white';
-            ctx.fillText('GAMEOVER!! press "ENTER" to try again!', canvas.width / 2 + 3, 203)
+            ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
+            ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2 + 3, 253);
         }
     }
 
