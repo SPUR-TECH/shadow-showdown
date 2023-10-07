@@ -30,7 +30,18 @@ window.addEventListener('load', function () {
     }
 
     class Player {
-
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 200;
+            this.height = 200;
+            this.x = 10;
+            this.y = this.gameHeight - this.height - 10;
+        }
+        draw(context) {
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
+        }
     }
 
     class Background {
@@ -50,6 +61,8 @@ window.addEventListener('load', function () {
     }
 
     const input = new InputHandler();
+    const player = new Player(canvas.width, canvas.height);
+    player.draw(ctx);
 
     function animate() {
 
