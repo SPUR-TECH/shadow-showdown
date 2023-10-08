@@ -239,11 +239,11 @@ window.addEventListener('load', function () {
             // Shadow text
             ctx.fillStyle = 'red';
             ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
-            ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2, 250);
+            ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2, 250);
             // Main text
             ctx.fillStyle = 'white';
             ctx.fillText('GAMEOVER!!', canvas.width / 2 + 3, 153);
-            ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2 + 3, 253);
+            ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2 + 3, 253);
         }
     }
 
