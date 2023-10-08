@@ -77,12 +77,21 @@ window.addEventListener('load', function () {
             this.maxFrame = 8;
         }
         draw(ctx) {
+            // ctx.strokeStyle = 'white';
+            // ctx.strokeRect(this.x, this.y, this.width, this.height);
+            // ctx.beginPath();
+            // ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+            // ctx.stroke();
+            // ctx.strokeStyle = 'blue';
+            // ctx.beginPath();
+            // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+            // ctx.stroke();
             ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input, deltaTime, enemies) {
             // collisionDetection
             enemies.forEach(enemy => {
-                const dx = (enemy.x + enemy.width / 2 - 35) - (this.x + enemy.width / 2);
+                const dx = (enemy.x + enemy.width / 2 - 30) - (this.x + enemy.width / 2);
                 const dy = (enemy.y + enemy.height / 2) - (this.y + enemy.height / 2);
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 if (distance < enemy.width / 2 + this.width / 2) {
@@ -173,6 +182,15 @@ window.addEventListener('load', function () {
 
         }
         draw(ctx) {
+            // ctx.strokeStyle = 'white';
+            // ctx.strokeRect(this.x, this.y, this.width, this.height);
+            // ctx.beginPath();
+            // ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+            // ctx.stroke();
+            // ctx.strokeStyle = 'blue';
+            // ctx.beginPath();
+            // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+            // ctx.stroke();
             ctx.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(deltaTime) {
@@ -209,19 +227,22 @@ window.addEventListener('load', function () {
     function displayStatusText(ctx) {
         ctx.textAlign = 'left';
         ctx.font = '40px Helvetica';
+        // Shadow text
         ctx.fillStyle = 'black';
         ctx.fillText('Score: ' + score, 20, 50)
+        // Main text
         ctx.fillStyle = 'yellow';
         ctx.fillText('Score: ' + score, 23, 53)
         if (gameOver) {
             ctx.textAlign = 'center';
             ctx.font = '60px Helvetica';
+            // Shadow text
             ctx.fillStyle = 'red';
             ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
             ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2, 250);
-
+            // Main text
             ctx.fillStyle = 'white';
-            ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
+            ctx.fillText('GAMEOVER!!', canvas.width / 2 + 3, 153);
             ctx.fillText('press "ENTER" or Swipe "UP" to try again!', canvas.width / 2 + 3, 253);
         }
     }
