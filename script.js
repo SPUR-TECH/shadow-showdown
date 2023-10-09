@@ -2,7 +2,7 @@ window.addEventListener('load', function () {
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     canvas.width = 1600;
-    canvas.height = 500;
+    canvas.height = 600;
     let enemies = [];
     let score = 0;
     let gameOver = false;
@@ -242,18 +242,18 @@ window.addEventListener('load', function () {
         ctx.fillText('Score: ' + score, 20, 50)
         // Main text
         ctx.fillStyle = 'yellow';
-        ctx.fillText('Score: ' + score, 23, 53)
+        ctx.fillText('Score: ' + score, 24, 54)
         if (gameOver) {
             ctx.textAlign = 'center';
-            ctx.font = '60px Creepster, cursive';
+            ctx.font = '80px Creepster, cursive';
             // Shadow text
             ctx.fillStyle = 'black';
             ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
             ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2, 250);
             // Main text
             ctx.fillStyle = 'red';
-            ctx.fillText('GAMEOVER!!', canvas.width / 2 + 3, 153);
-            ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2 + 3, 253);
+            ctx.fillText('GAMEOVER!!', canvas.width / 2 + 6, 156);
+            ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2 + 6, 256);
         }
     }
 
@@ -279,7 +279,7 @@ window.addEventListener('load', function () {
             this.x = 0;
             this.y = 0;
             this.width = 1600;
-            this.height = 500;
+            this.height = 600;
             this.x2 = this.width;
             this.image = image;
             this.speedModifier = speedModifier;
