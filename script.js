@@ -170,7 +170,7 @@ window.addEventListener('load', function () {
     backgroundLayer10.src = './images/forrest-layer-5.png';
 
     const backgroundLayer11 = new Image();
-    backgroundLayer11.src = './images/Parallax Forest Background - Blue/3Particles.png';
+    backgroundLayer11.src = './images/Parallax Forest Background - Blue/grass.png';
 
 
     class Enemy {
@@ -236,7 +236,7 @@ window.addEventListener('load', function () {
 
     function displayStatusText(ctx) {
         ctx.textAlign = 'left';
-        ctx.font = '40px Helvetica';
+        ctx.font = '40px Creepster, cursive';
         // Shadow text
         ctx.fillStyle = 'black';
         ctx.fillText('Score: ' + score, 20, 50)
@@ -245,13 +245,13 @@ window.addEventListener('load', function () {
         ctx.fillText('Score: ' + score, 23, 53)
         if (gameOver) {
             ctx.textAlign = 'center';
-            ctx.font = '60px Helvetica';
+            ctx.font = '60px Creepster, cursive';
             // Shadow text
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = 'black';
             ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
             ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2, 250);
             // Main text
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'red';
             ctx.fillText('GAMEOVER!!', canvas.width / 2 + 3, 153);
             ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2 + 3, 253);
         }
@@ -330,6 +330,8 @@ window.addEventListener('load', function () {
         player.draw(ctx);
         player.update(input, deltaTime, enemies);
         handleEnemies(deltaTime);
+        layer11.draw(backgroundLayer11);
+
         displayStatusText(ctx);
         if (!gameOver) requestAnimationFrame(animate);
     }

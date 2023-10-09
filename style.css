@@ -19,6 +19,7 @@ body {
     max-height: 100%;
     touch-action: pan-y;
     touch-action: pan-x;
+    font-family: 'Creepster', cursive;
 }
 
 #playerImage,
