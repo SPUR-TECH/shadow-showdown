@@ -1,11 +1,12 @@
 window.addEventListener('load', function () {
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
-    canvas.width = 1800;
-    canvas.height = 720;
+    canvas.width = 1600;
+    canvas.height = 500;
     let enemies = [];
     let score = 0;
     let gameOver = false;
+    let gameSpeed = 5;
 
     class InputHandler {
         constructor() {
@@ -138,45 +139,39 @@ window.addEventListener('load', function () {
         }
     }
 
-    // const backgroundLayer1 = new Image();
-    // backgroundLayer1.src = './layer-1.png';
+    const backgroundLayer1 = new Image();
+    backgroundLayer1.src = './images/Parallax Forest Background - Blue/10Sky.png';
 
-    // const backgroundLayer2 = new Image();
-    // backgroundLayer2.src = './layer-2.png';
+    const backgroundLayer2 = new Image();
+    backgroundLayer2.src = './images/Parallax Forest Background - Blue/9Forest.png';
 
-    // const backgroundLayer3 = new Image();
-    // backgroundLayer3.src = './layer-3.png';
+    const backgroundLayer3 = new Image();
+    backgroundLayer3.src = './images/forrest-layer-2.png';
 
-    // const backgroundLayer4 = new Image();
-    // backgroundLayer4.src = './layer-4.png';
+    const backgroundLayer4 = new Image();
+    backgroundLayer4.src = './images/Parallax Forest Background - Blue/7Forest.png';
 
-    // const backgroundLayer5 = new Image();
-    // backgroundLayer5.src = './layer-5.png';
+    const backgroundLayer5 = new Image();
+    backgroundLayer5.src = './images/Parallax Forest Background - Blue/6Forest.png';
 
-    class Background {
-        constructor(gameWidth, gameHeight) {
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.image = document.getElementById('backgroundImage');
-            this.x = 0;
-            this.y = 0;
-            this.width = 2400;
-            this.height = 720;
-            this.speed = 5;
-        }
-        draw(ctx) {
-            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-            ctx.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
-        }
-        update() {
-            this.x -= this.speed;
-            if (this.x < 0 - this.width) this.x = 0;
-        }
+    const backgroundLayer6 = new Image();
+    backgroundLayer6.src = './images/Parallax Forest Background - Blue/5Particles.png';
 
-        restart() {
-            this.x = 0;
-        }
-    }
+    const backgroundLayer7 = new Image();
+    backgroundLayer7.src = './images/Parallax Forest Background - Blue/4Forest.png';
+
+    const backgroundLayer8 = new Image();
+    backgroundLayer8.src = './images/forrest-layer-4.png';
+
+    const backgroundLayer9 = new Image();
+    backgroundLayer9.src = './images/forrest-layer-5.png';
+
+    const backgroundLayer10 = new Image();
+    backgroundLayer10.src = './images/forrest-layer-5.png';
+
+    const backgroundLayer11 = new Image();
+    backgroundLayer11.src = './images/Parallax Forest Background - Blue/3Particles.png';
+
 
     class Enemy {
         constructor(gameWidth, gameHeight) {
@@ -264,7 +259,7 @@ window.addEventListener('load', function () {
 
     function restartGame() {
         player.restart();
-        background.restart();
+        // background.restart();
         enemies = [];
         score = 0;
         gameOver = false;
@@ -273,19 +268,65 @@ window.addEventListener('load', function () {
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
-    const background = new Background(canvas.width, canvas.height);
 
     let lastTime = 0;
     let enemyTimer = 0;
     let enemyInterval = 1000;
     let randomEnemyInterval = Math.random() * 1000 + 100;
 
+    class Layer {
+        constructor(image, speedModifier) {
+            this.x = 0;
+            this.y = 0;
+            this.width = 1600;
+            this.height = 500;
+            this.x2 = this.width;
+            this.image = image;
+            this.speedModifier = speedModifier;
+            this.speed = gameSpeed * this.speedModifier;
+        }
+        update() {
+            this.speed = gameSpeed * this.speedModifier;
+            if (this.x <= -this.width) {
+                this.x = this.width + this.x2 - this.speed;
+            }
+            if (this.x2 <= -this.width) {
+                this.x2 = this.width + this.x - this.speed;
+            }
+            this.x = Math.floor(this.x - this.speed);
+            this.x2 = Math.floor(this.x2 - this.speed);
+        }
+
+        draw() {
+            ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            ctx.drawImage(this.image, this.x2, this.y, this.width, this.height);
+        }
+    }
+
+    const layer1 = new Layer(backgroundLayer1, 0.2);
+    const layer2 = new Layer(backgroundLayer2, 0.4);
+    const layer3 = new Layer(backgroundLayer3, 0.6);
+    const layer4 = new Layer(backgroundLayer4, 0.8);
+    const layer5 = new Layer(backgroundLayer5, 1);
+    const layer6 = new Layer(backgroundLayer6, 1.5);
+    const layer7 = new Layer(backgroundLayer7, 1.7);
+    const layer8 = new Layer(backgroundLayer8, 1.9);
+    const layer9 = new Layer(backgroundLayer9, 2);
+    const layer10 = new Layer(backgroundLayer10, 2.5);
+    const layer11 = new Layer(backgroundLayer11, 2.6);
+
+    const layerObjects = [layer1, layer2, layer3, layer4, layer5, layer6, layer7, layer8, layer9, layer10, layer11];
+
     function animate(timeStamp) {
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        background.draw(ctx);
-        background.update();
+
+        layerObjects.forEach(object => {
+            object.update();
+            object.draw();
+        });
+
         player.draw(ctx);
         player.update(input, deltaTime, enemies);
         handleEnemies(deltaTime);
