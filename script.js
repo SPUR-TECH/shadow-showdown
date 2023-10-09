@@ -2,16 +2,18 @@ window.addEventListener('load', function () {
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     canvas.width = 1600;
-    canvas.height = 600;
+    canvas.height = 710;
     let enemies = [];
     let score = 0;
     let gameOver = false;
     let gameSpeed = 2;
+    let explosions = [];
+    let canvasPosition = canvas.getBoundingClientRect();
+    // console.log(canvasPosition);
 
     const fullscreen = document.getElementById("fullscreen");
 
     function toggleFullscreen() {
-        console.log(document.fullscreenElement);
         if (!document.fullscreenElement) {
             canvas.requestFullscreen().catch(err => {
                 alert(`Error cant enable full-screen mode: ${err.message}`);
@@ -66,6 +68,42 @@ window.addEventListener('load', function () {
         }
     }
 
+    class Explosion {
+        constructor(x, y) {
+            this.spriteWidth = 200;
+            this.spriteHeight = 179;
+            this.width = this.spriteWidth / 2;
+            this.height = this.spriteHeight / 2;
+            this.x = x - this.width / 2;
+            this.y = y - this.height / 2;
+            this.image = new Image();
+            this.image.src = './images/boom.png';
+            this.frame = 0;
+            this.timer = 0;
+        }
+        update() {
+            this.timer++;
+            if (this.timer % 10 === 0) {
+                this.frame++;
+            }
+        }
+        draw() {
+            // ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
+            ctx.drawImage(this.image, this.spriteWidth * this.frame, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+        }
+    }
+
+    window.addEventListener('click', function (e) {
+        createExplosion(e);
+    });
+
+    function createExplosion(e) {
+        let positionX = e.x - canvasPosition.left;
+        let positionY = e.y - canvasPosition.top;
+        explosions.push(new Explosion(positionX, positionY));
+        console.log(explosions);
+    }
+
     class Player {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
@@ -92,10 +130,10 @@ window.addEventListener('load', function () {
             this.maxFrame = 8;
         }
         draw(ctx) {
-            ctx.strokeStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(this.x + this.width / 2, this.y + this.height / 2 + 20, this.width / 3, 0, Math.PI * 2);
-            ctx.stroke();
+            // ctx.strokeStyle = 'white';
+            // ctx.beginPath();
+            // ctx.arc(this.x + this.width / 2, this.y + this.height / 2 + 20, this.width / 3, 0, Math.PI * 2);
+            // ctx.stroke();
             // ctx.strokeStyle = 'blue';
             // ctx.beginPath();
             // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
@@ -205,10 +243,10 @@ window.addEventListener('load', function () {
 
         }
         draw(ctx) {
-            ctx.strokeStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(this.x + this.width / 2 - 25, this.y + this.height / 2, this.width / 2.5, 0, Math.PI * 2);
-            ctx.stroke();
+            // ctx.strokeStyle = 'white';
+            // ctx.beginPath();
+            // ctx.arc(this.x + this.width / 2 - 25, this.y + this.height / 2, this.width / 2.5, 0, Math.PI * 2);
+            // ctx.stroke();
             // ctx.strokeStyle = 'blue';
             // ctx.beginPath();
             // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
@@ -291,7 +329,7 @@ window.addEventListener('load', function () {
             this.x = 0;
             this.y = 0;
             this.width = 1600;
-            this.height = 600;
+            this.height = 710;
             this.x2 = this.width;
             this.image = image;
             this.speedModifier = speedModifier;
@@ -333,6 +371,15 @@ window.addEventListener('load', function () {
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < explosions.length; i++) {
+            explosions[i].update();
+            explosions[i].draw();
+            if (explosions[i].frame > 5) {
+                explosions.splice(i, 1);
+                i--;
+            }
+        }
 
         layerObjects.forEach(object => {
             object.update();

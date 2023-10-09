@@ -24,7 +24,10 @@ body {
 
 #playerImage,
 #backgroundImage,
-#enemyImage {
+#enemyImage
+
+/* #boomImage */
+    {
     display: none;
 }
 
