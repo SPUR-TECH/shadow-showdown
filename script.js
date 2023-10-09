@@ -8,6 +8,20 @@ window.addEventListener('load', function () {
     let gameOver = false;
     let gameSpeed = 2;
 
+    const fullscreen = document.getElementById("fullscreen");
+
+    function toggleFullscreen() {
+        console.log(document.fullscreenElement);
+        if (!document.fullscreenElement) {
+            canvas.requestFullscreen().catch(err => {
+                alert(`Error cant enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+    fullscreen.addEventListener('click', toggleFullscreen);
+
     class InputHandler {
         constructor() {
             this.keys = [];
