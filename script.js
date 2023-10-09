@@ -6,7 +6,7 @@ window.addEventListener('load', function () {
     let enemies = [];
     let score = 0;
     let gameOver = false;
-    let gameSpeed = 5;
+    let gameSpeed = 2;
 
     class InputHandler {
         constructor() {
