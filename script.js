@@ -38,7 +38,7 @@ window.addEventListener('load', function () {
             this.fps = 20;
             this.frameTimer = 0;
             this.frameInterval = 1000 / this.fps;
-            this.speed = 0; // Adjusted speed for left/right movement
+            this.speed = 0;
             this.vy = 0;
             this.gravity = 1;
             this.jumping = false;
@@ -67,7 +67,7 @@ window.addEventListener('load', function () {
         }
 
         update(input, deltaTime) {
-            if (gameOver) return; // Stop player updates when game is over
+            if (gameOver) return; // Stop player updates when the game is over
 
             // Handle collision with enemies
             enemies.forEach(enemy => {
@@ -91,11 +91,14 @@ window.addEventListener('load', function () {
                 this.speed = 5;
             } else if (input.keys.has('ArrowLeft')) {
                 this.speed = -5;
-            } else if (input.keys.has('ArrowUp') && this.onGround(enemies)) {
-                this.vy = -30;
-                this.jumping = true;
             } else {
                 this.speed = 0;
+            }
+
+            // Handle jumping
+            if (input.keys.has('ArrowUp') && this.onGround(enemies) && !this.jumping) {
+                this.vy = -30;
+                this.jumping = true;
             }
 
             this.x += this.speed;
