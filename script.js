@@ -9,7 +9,6 @@ window.addEventListener('load', function () {
     let gameSpeed = 2;
     let explosions = [];
     let canvasPosition = canvas.getBoundingClientRect();
-    // console.log(canvasPosition);
 
     const fullscreen = document.getElementById("fullscreen");
 
@@ -24,47 +23,182 @@ window.addEventListener('load', function () {
     }
     fullscreen.addEventListener('click', toggleFullscreen);
 
+    class Player {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 200;
+            this.height = 200;
+            this.x = 100;
+            this.y = this.gameHeight - this.height;
+            this.image = document.getElementById('playerImage');
+            this.frameX = 0;
+            this.frameY = 0;
+            this.maxFrame = 8;
+            this.fps = 20;
+            this.frameTimer = 0;
+            this.frameInterval = 1000 / this.fps;
+            this.speed = 0; // Adjusted speed for left/right movement
+            this.vy = 0;
+            this.gravity = 1;
+            this.jumping = false;
+        }
+
+        restart() {
+            this.x = 100;
+            this.y = this.gameHeight - this.height;
+            this.frameY = 0;
+            this.maxFrame = 8;
+            this.jumping = false;
+        }
+
+        draw(ctx) {
+            ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+
+        handleInput(keys) {
+            if (keys.has('ArrowRight')) {
+                this.speed = 5;
+            } else if (keys.has('ArrowLeft')) {
+                this.speed = -5;
+            } else {
+                this.speed = 0;
+            }
+        }
+
+        update(input, deltaTime) {
+            if (gameOver) return; // Stop player updates when game is over
+
+            // Handle collision with enemies
+            enemies.forEach(enemy => {
+                const dx = (enemy.x + enemy.width / 2 - 30) - (this.x + enemy.width / 2);
+                const dy = (enemy.y + enemy.height / 2) - (this.y + enemy.height / 2 + 20);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < enemy.width / 2 + this.width / 3) {
+                    gameOver = true;
+                }
+            });
+
+            // Handle player animation frames
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX++;
+                this.frameTimer = 0;
+            } else this.frameTimer += deltaTime;
+
+            // Handle player movement
+            if (input.keys.has('ArrowRight')) {
+                this.speed = 5;
+            } else if (input.keys.has('ArrowLeft')) {
+                this.speed = -5;
+            } else if (input.keys.has('ArrowUp') && this.onGround(enemies)) {
+                this.vy = -30;
+                this.jumping = true;
+            } else {
+                this.speed = 0;
+            }
+
+            this.x += this.speed;
+            if (this.x < 0) this.x = 0;
+            else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+
+            this.y += this.vy;
+            if (!this.onGround(enemies)) {
+                this.vy += this.gravity;
+                this.frameY = 1;
+                this.maxFrame = 5;
+            } else {
+                this.vy = 0;
+                this.frameY = 0;
+                this.maxFrame = 8;
+                if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height;
+                if (this.jumping) this.jumping = false;
+            }
+        }
+
+        onGround(enemies) {
+            return this.y >= this.gameHeight - this.height && !enemies.some(enemy => this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y);
+        }
+    }
+
     class InputHandler {
-        constructor() {
-            this.keys = [];
-            this.touchY = '';
+        constructor(player) {
+            this.keys = new Set();
+            this.touchStartX = 0;
+            this.touchStartY = 0;
             this.touchThreshold = 30;
-            window.addEventListener('keydown', e => {
-                if ((e.key === 'ArrowDown' ||
-                        e.key === 'ArrowUp' ||
-                        e.key === 'ArrowLeft' ||
-                        e.key === 'ArrowRight') &&
-                    this.keys.indexOf(e.key) === -1) {
-                    this.keys.push(e.key);
-                } else if (e.key === 'Enter' && gameOver) restartGame();
+            this.player = player;
 
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && gameOver) restartGame();
+                this.keys.add(e.key);
+                this.handleKeyPresses();
             });
-            window.addEventListener('keyup', e => {
-                if (e.key === 'ArrowDown' ||
-                    e.key === 'ArrowUp' ||
-                    e.key === 'ArrowLeft' ||
-                    e.key === 'ArrowRight') {
-                    this.keys.splice(this.keys.indexOf(e.key), 1);
+
+            window.addEventListener('keyup', (e) => {
+                this.keys.delete(e.key);
+                this.handleKeyPresses();
+            });
+
+            window.addEventListener('touchstart', (e) => {
+                this.touchStartX = e.changedTouches[0].pageX;
+                this.touchStartY = e.changedTouches[0].pageY;
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touchX = e.changedTouches[0].pageX;
+                const touchY = e.changedTouches[0].pageY;
+                const deltaX = touchX - this.touchStartX;
+                const deltaY = touchY - this.touchStartY;
+
+                if (Math.abs(deltaX) > this.touchThreshold) {
+                    if (deltaX < 0) {
+                        this.keys.add('ArrowLeft');
+                        this.keys.delete('ArrowRight');
+                    } else {
+                        this.keys.add('ArrowRight');
+                        this.keys.delete('ArrowLeft');
+                    }
+                } else {
+                    this.keys.delete('ArrowLeft');
+                    this.keys.delete('ArrowRight');
+                }
+
+                if (deltaY < -this.touchThreshold && this.player.onGround(enemies)) {
+                    this.keys.add('ArrowUp');
+                } else if (deltaY > this.touchThreshold) {
+                    this.keys.add('ArrowDown');
+                } else {
+                    this.keys.delete('ArrowUp');
+                    this.keys.delete('ArrowDown');
+                }
+
+                this.handleKeyPresses();
+            });
+
+            window.addEventListener('touchend', (e) => {
+                this.keys.delete('ArrowLeft');
+                this.keys.delete('ArrowRight');
+                this.keys.delete('ArrowUp');
+                this.keys.delete('ArrowDown');
+                this.handleKeyPresses();
+
+                if (gameOver) {
+                    // Check for a swipe down gesture only when the game is over
+                    const touchEndY = e.changedTouches[0].pageY;
+                    const deltaY = touchEndY - this.touchStartY;
+                    if (deltaY > this.touchThreshold) {
+                        restartGame(); // Call the restartGame function on swipe down during game over
+                    }
                 }
             });
+        }
 
-            window.addEventListener('touchstart', e => {
-                this.touchY = e.changedTouches[0].pageY
-            });
-
-            window.addEventListener('touchmove', e => {
-                const swipeDistance = e.changedTouches[0].pageY - this.touchY;
-                if (swipeDistance < -this.touchThreshold && this.keys.indexOf('swipe up') === -1) this.keys.push('swipe up');
-                else if (swipeDistance > this.touchThreshold && this.keys.indexOf('swipe down') === -1) {
-                    this.keys.push('swipe down');
-                    if (gameOver) restartGame();
-                }
-            });
-
-            window.addEventListener('touchend', e => {
-                this.keys.splice(this.keys.indexOf('swipe up'), 1);
-                this.keys.splice(this.keys.indexOf('swipe down'), 1);
-            });
+        handleKeyPresses() {
+            if (this.player) {
+                this.player.handleInput(this.keys);
+            }
         }
     }
 
@@ -88,7 +222,6 @@ window.addEventListener('load', function () {
             }
         }
         draw() {
-            // ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
             ctx.drawImage(this.image, this.spriteWidth * this.frame, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
         }
     }
@@ -101,93 +234,6 @@ window.addEventListener('load', function () {
         let positionX = e.x - canvasPosition.left;
         let positionY = e.y - canvasPosition.top;
         explosions.push(new Explosion(positionX, positionY));
-        console.log(explosions);
-    }
-
-    class Player {
-        constructor(gameWidth, gameHeight) {
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.width = 200;
-            this.height = 200;
-            this.x = 100;
-            this.y = this.gameHeight - this.height;
-            this.image = document.getElementById('playerImage');
-            this.frameX = 0;
-            this.frameY = 0;
-            this.maxFrame = 8;
-            this.fps = 20;
-            this.frameTimer = 0;
-            this.frameInterval = 1000 / this.fps;
-            this.speed = 0;
-            this.vy = 0;
-            this.gravity = 1;
-        }
-        restart() {
-            this.x = 100;
-            this.y = this.gameHeight - this.height;
-            this.frameY = 0;
-            this.maxFrame = 8;
-        }
-        draw(ctx) {
-            // ctx.strokeStyle = 'white';
-            // ctx.beginPath();
-            // ctx.arc(this.x + this.width / 2, this.y + this.height / 2 + 20, this.width / 3, 0, Math.PI * 2);
-            // ctx.stroke();
-            // ctx.strokeStyle = 'blue';
-            // ctx.beginPath();
-            // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
-            // ctx.stroke();
-            ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-        }
-        update(input, deltaTime, enemies) {
-            // collisionDetection
-            enemies.forEach(enemy => {
-                const dx = (enemy.x + enemy.width / 2 - 30) - (this.x + enemy.width / 2);
-                const dy = (enemy.y + enemy.height / 2) - (this.y + enemy.height / 2 + 20);
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < enemy.width / 2 + this.width / 3) {
-                    gameOver = true;
-                }
-            })
-            // Sprite Animation
-            if (this.frameTimer > this.frameInterval) {
-                if (this.frameX >= this.maxFrame) this.frameX = 0;
-                else this.frameX++;
-                this.frameTimer = 0;
-            } else this.frameTimer += deltaTime;
-
-            // Controls
-            if (input.keys.indexOf('ArrowRight') > -1) {
-                this.speed = 5;
-            } else if (input.keys.indexOf('ArrowLeft') > -1) {
-                this.speed = -5;
-            } else if ((input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1) && this.onGround()) {
-                this.vy = -30;
-            } else {
-                this.speed = 0;
-            }
-            // Horizontal movement
-            this.x += this.speed;
-            if (this.x < 0) this.x = 0;
-            else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
-
-            // vertical movement
-            this.y += this.vy;
-            if (!this.onGround()) {
-                this.vy += this.gravity;
-                this.frameY = 1;
-                this.maxFrame = 5;
-            } else {
-                this.vy = 0;
-                this.frameY = 0;
-                this.maxFrame = 8;
-            }
-            if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
-        }
-        onGround() {
-            return this.y >= this.gameHeight - this.height;
-        }
     }
 
     const backgroundLayer1 = new Image();
@@ -223,7 +269,6 @@ window.addEventListener('load', function () {
     const backgroundLayer11 = new Image();
     backgroundLayer11.src = './images/Parallax Forest Background - Blue/grass.png';
 
-
     class Enemy {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
@@ -240,17 +285,8 @@ window.addEventListener('load', function () {
             this.frameInterval = 1000 / this.fps;
             this.speed = 7;
             this.markedForDeletion = false;
-
         }
         draw(ctx) {
-            // ctx.strokeStyle = 'white';
-            // ctx.beginPath();
-            // ctx.arc(this.x + this.width / 2 - 25, this.y + this.height / 2, this.width / 2.5, 0, Math.PI * 2);
-            // ctx.stroke();
-            // ctx.strokeStyle = 'blue';
-            // ctx.beginPath();
-            // ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
-            // ctx.stroke();
             ctx.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(deltaTime) {
@@ -261,7 +297,7 @@ window.addEventListener('load', function () {
             } else {
                 this.frameTimer += deltaTime;
             }
-            this.x -= this.speed;;
+            this.x -= this.speed;
             if (this.x < 0 - this.width) {
                 this.markedForDeletion = true;
                 score++;
@@ -287,20 +323,16 @@ window.addEventListener('load', function () {
     function displayStatusText(ctx) {
         ctx.textAlign = 'left';
         ctx.font = '40px Creepster, cursive';
-        // Shadow text
         ctx.fillStyle = 'black';
         ctx.fillText('Score: ' + score, 20, 50)
-        // Main text
         ctx.fillStyle = 'yellow';
         ctx.fillText('Score: ' + score, 24, 54)
         if (gameOver) {
             ctx.textAlign = 'center';
             ctx.font = '80px Creepster, cursive';
-            // Shadow text
             ctx.fillStyle = 'black';
             ctx.fillText('GAMEOVER!!', canvas.width / 2, 150);
             ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2, 250);
-            // Main text
             ctx.fillStyle = 'red';
             ctx.fillText('GAMEOVER!!', canvas.width / 2 + 6, 156);
             ctx.fillText('press "ENTER" or Swipe "DOWN" to try again!', canvas.width / 2 + 6, 256);
@@ -309,15 +341,14 @@ window.addEventListener('load', function () {
 
     function restartGame() {
         player.restart();
-        // background.restart();
         enemies = [];
         score = 0;
         gameOver = false;
         animate(0);
     }
 
-    const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
+    const input = new InputHandler(player);
 
     let lastTime = 0;
     let enemyTimer = 0;
@@ -387,7 +418,7 @@ window.addEventListener('load', function () {
         });
 
         player.draw(ctx);
-        player.update(input, deltaTime, enemies);
+        player.update(input, deltaTime);
         handleEnemies(deltaTime);
         layer11.draw(backgroundLayer11);
 
