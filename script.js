@@ -7,7 +7,7 @@ window.addEventListener('load', function () {
     let score = 0;
     let gameOver = false;
     let gameSpeed = 2;
-    let explosions = [];
+    // let explosions = [];
     let canvasPosition = canvas.getBoundingClientRect();
 
     const fullscreen = document.getElementById("fullscreen");
@@ -205,39 +205,39 @@ window.addEventListener('load', function () {
         }
     }
 
-    class Explosion {
-        constructor(x, y) {
-            this.spriteWidth = 200;
-            this.spriteHeight = 179;
-            this.width = this.spriteWidth / 2;
-            this.height = this.spriteHeight / 2;
-            this.x = x - this.width / 2;
-            this.y = y - this.height / 2;
-            this.image = new Image();
-            this.image.src = './images/boom.png';
-            this.frame = 0;
-            this.timer = 0;
-        }
-        update() {
-            this.timer++;
-            if (this.timer % 10 === 0) {
-                this.frame++;
-            }
-        }
-        draw() {
-            ctx.drawImage(this.image, this.spriteWidth * this.frame, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
-        }
-    }
+    // class Explosion {
+    //     constructor(x, y) {
+    //         this.spriteWidth = 200;
+    //         this.spriteHeight = 179;
+    //         this.width = this.spriteWidth / 2;
+    //         this.height = this.spriteHeight / 2;
+    //         this.x = x - this.width / 2;
+    //         this.y = y - this.height / 2;
+    //         this.image = new Image();
+    //         this.image.src = './images/boom.png';
+    //         this.frame = 0;
+    //         this.timer = 0;
+    //     }
+    //     update() {
+    //         this.timer++;
+    //         if (this.timer % 10 === 0) {
+    //             this.frame++;
+    //         }
+    //     }
+    //     draw() {
+    //         ctx.drawImage(this.image, this.spriteWidth * this.frame, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+    //     }
+    // }
 
-    window.addEventListener('click', function (e) {
-        createExplosion(e);
-    });
+    // window.addEventListener('click', function (e) {
+    //     createExplosion(e);
+    // });
 
-    function createExplosion(e) {
-        let positionX = e.x - canvasPosition.left;
-        let positionY = e.y - canvasPosition.top;
-        explosions.push(new Explosion(positionX, positionY));
-    }
+    // function createExplosion(e) {
+    //     let positionX = e.x - canvasPosition.left;
+    //     let positionY = e.y - canvasPosition.top;
+    //     explosions.push(new Explosion(positionX, positionY));
+    // }
 
     const backgroundLayer1 = new Image();
     backgroundLayer1.src = './images/Parallax Forest Background - Blue/10Sky.png';
@@ -406,14 +406,14 @@ window.addEventListener('load', function () {
         lastTime = timeStamp
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < explosions.length; i++) {
-            explosions[i].update();
-            explosions[i].draw();
-            if (explosions[i].frame > 5) {
-                explosions.splice(i, 1);
-                i--;
-            }
-        }
+        // for (let i = 0; i < explosions.length; i++) {
+        //     explosions[i].update();
+        //     explosions[i].draw();
+        //     if (explosions[i].frame > 5) {
+        //         explosions.splice(i, 1);
+        //         i--;
+        //     }
+        // }
 
         layerObjects.forEach(object => {
             object.update();
