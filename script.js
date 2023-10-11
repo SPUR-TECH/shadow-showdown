@@ -192,7 +192,7 @@ window.addEventListener('load', function () {
                     const touchEndY = e.changedTouches[0].pageY;
                     const deltaY = touchEndY - this.touchStartY;
                     if (deltaY > this.touchThreshold) {
-                        restartGame(); // Call the restartGame function on swipe down during game over
+                        restartGame(); // Call the restartGame function on swipe down if game over
                     }
                 }
             });
@@ -278,7 +278,7 @@ window.addEventListener('load', function () {
             this.gameHeight = gameHeight;
             this.width = 160;
             this.height = 119;
-            this.image = document.getElementById('enemyImage');
+            this.image = document.getElementById('worm');
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
             this.frameX = 0;
