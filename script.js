@@ -2,7 +2,7 @@ window.addEventListener('load', function () {
     const canvas = document.getElementById("canvas1");
     const ctx = canvas.getContext('2d');
     canvas.width = 1600;
-    canvas.height = 710;
+    canvas.height = 720;
     let enemies = [];
     let score = 0;
     let gameOver = false;
@@ -31,7 +31,7 @@ window.addEventListener('load', function () {
             this.height = 200;
             this.x = 100;
             this.y = this.gameHeight - this.height;
-            this.image = document.getElementById('playerImage');
+            this.image = document.getElementById('player');
             this.frameX = 0;
             this.frameY = 0;
             this.maxFrame = 8;
