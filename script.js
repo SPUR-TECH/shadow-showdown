@@ -8,7 +8,7 @@ window.addEventListener('load', function () {
     let gameOver = false;
     let gameSpeed = 2;
     // let explosions = [];
-    let canvasPosition = canvas.getBoundingClientRect();
+    // let canvasPosition = canvas.getBoundingClientRect();
 
     const fullscreen = document.getElementById("fullscreen");
 
